@@ -2,15 +2,19 @@
 #include <SDL_image.h>
 #include <iostream>
 
-Window::Window(const std::string& title, int w, int h) : 
+Window::Window(const std::string& title, int w, int h) :
 	title(title), w(w), h(h)
 {
-	if (!init()) 
+	
+	if (!init())
 	{
 		closed = true;
 	}
 }
 
+/*
+	Decunstructor, destroys the renderers and quits the window
+*/
 Window::~Window()
 {
 	SDL_DestroyRenderer(renderer);
@@ -19,7 +23,10 @@ Window::~Window()
 	SDL_Quit();
 }
 
-void Window::pollEvents(SDL_Event &event)
+/*
+	Controls the window so it can be quited
+*/
+void Window::pollEvents(SDL_Event& event)
 {
 	switch (event.type)
 	{
@@ -34,56 +41,49 @@ void Window::pollEvents(SDL_Event &event)
 	}
 }
 
-void Window::background() const
+
+void Window::showWindow()
 {
-
-//	SDL_RenderPresent(renderer);
-	//SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	//SDL_RenderClear(renderer);
-
-	
-	SDL_RenderPresent(renderer);
-	SDL_Surface* bgSurf = SDL_LoadBMP("C:/Users/Admin/Pictures/bg_space.bmp");
-	SDL_Texture* bgTx = SDL_CreateTextureFromSurface(renderer, bgSurf);
-
-	SDL_RenderCopy(renderer, bgTx, NULL, NULL);
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 250);
 	SDL_RenderClear(renderer);
-	SDL_DestroyTexture(bgTx);
+	SDL_RenderPresent(renderer);
 }
+
 
 bool Window::init()
 {
-	if (SDL_Init(SDL_INIT_VIDEO) != 0) 
+
+	if (SDL_Init(SDL_INIT_VIDEO) != 0)
 	{
 		std::cerr << "Failed to initilize SDL\n";
-		return 0;
-	}
-	 
-	if (IMG_Init(IMG_INIT_JPG) != IMG_INIT_JPG)
-	{
-		std::cerr << "Failed to initilaized image\n";
 		return false;
-
 	}
+
+	
+	if (IMG_Init(IMG_INIT_PNG) != IMG_INIT_PNG) {
+		std::cerr << "Failed to initilazed the image\n";
+		return false;
+	}
+	
 
 	window = SDL_CreateWindow(
-	title.c_str(), SDL_WINDOWPOS_CENTERED, 
+		title.c_str(), SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED, w, h, 0);
 
-	if (window == nullptr) 
+	if (window == nullptr)
 	{
 		std::cerr << "Failed to create window\n";
 		return false;
 	}
 
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
 	if (renderer == nullptr)
 	{
-		std::cerr << "Failed to create renderer\n";
+		std::cerr << "Failed to create window\n";
 		return false;
 	}
 
-
 	return true;
 }
+
