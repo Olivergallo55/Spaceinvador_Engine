@@ -5,7 +5,7 @@
 class Window
 {
 public:
-	Window(){}
+	Window() { }
 	Window(const std::string& title, int w, int h);
 	~Window();
 	bool init();
