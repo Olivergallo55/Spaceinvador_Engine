@@ -8,13 +8,14 @@
 	This method controls the player and the window interaction and takes care of that the input for these happens seperatly and 
 	nothing gets fucked up. 
 */
-void pollEvents(Window& window)
+void pollEvents(Window& window, Player& player)
 {
 	SDL_Event event;
 
 	if (SDL_PollEvent(&event))
 	{
 		window.pollEvents(event);
+		player.pollEvents(event);
 	}
 }
 
@@ -26,30 +27,17 @@ int main(int argc, char** argv)
 	{
 
 	Window window("Space invador", 800, 600);
+	Player player(100, 100, 100, 100, "", window);
+	Player pl(200, 200, 200, 200, "", window);
 
 	while (!window.is_closed()) {
-		pollEvents(window);
+		pollEvents(window, player);
 		window.showWindow();
-
-		IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
-
-		SDL_Rect rect;
-
-		rect.x = 200;
-		rect.y = 200;
-		rect.h = 200;
-		rect.w = 200;
-
-		SDL_Surface* image = IMG_Load("C:/Users/Admin/Desktop/TestEngine/TestEngine/3.jpg");
-		SDL_Texture* image_texture = SDL_CreateTextureFromSurface(window.renderer, image);
-		SDL_FreeSurface(image);
-
-		// Draw
-		SDL_RenderCopy(window.renderer, image_texture, NULL, &rect);
-		
+		player.showPlayer(window);
 
 		// Show what was drawn
-		SDL_RenderPresent(window.renderer);
+		SDL_RenderPresent(window.getRenderer());
+
 	}
       
 	return 0;
