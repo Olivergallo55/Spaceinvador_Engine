@@ -1,31 +1,82 @@
-#pragma once
-#include <string>
-#include <SDL.h>
+#include "Window.h"
+#include <SDL_image.h>
+#include <iostream>
 
-class Window
+Window::Window(const std::string& title, int w, int h) :
+	title(title), w(w), h(h)
 {
-public:
-	Window(){}
-	Window(const std::string& title, int w, int h);
-	~Window();
-	bool init();
-	inline bool is_closed() const { return closed; }
-	SDL_Renderer* renderer;
-	SDL_Renderer* getRenderer() const { return renderer;  }
-	void pollEvents(SDL_Event& event);
-	void showWindow();
+	
+	if (!init())
+	{
+		closed = true;
+	}
+}
 
-private:
-	std::string title;
-	int w = 800;
-	int h = 600;
-	bool closed = false;
+/*
+	Decunstructor, destroys the renderers and quits the window
+*/
+Window::~Window()
+{
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	IMG_Quit();
+	SDL_Quit();
+}
 
-	SDL_Window* window;
+/*
+	Controls the window so it can be quited
+*/
+void Window::pollEvents(SDL_Event& event)
+{
+	switch (event.type)
+	{
+	case SDL_QUIT:
+		closed = true;
+		break;
+	case SDLK_ESCAPE:
+		closed = true;
+		break;
+	default:
+		break;
+	}
+}
 
-};
 
-extern Window wind;
+void Window::showWindow()
+{
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderClear(renderer);
+}
 
 
-   
+bool Window::init()
+{
+
+	if (SDL_Init(SDL_INIT_VIDEO) != 0)
+	{
+		std::cerr << "Failed to initilize SDL\n";
+		return false;
+	}
+
+	window = SDL_CreateWindow(
+		title.c_str(), SDL_WINDOWPOS_CENTERED,
+		SDL_WINDOWPOS_CENTERED, w, h, 0);
+
+	if (window == nullptr)
+	{
+		std::cerr << "Failed to create window\n";
+		return false;
+	}
+
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+	if (renderer == nullptr)
+	{
+		std::cerr << "Failed to create window\n";
+		return false;
+	}
+
+	return true;
+}
+
+Window wind;
