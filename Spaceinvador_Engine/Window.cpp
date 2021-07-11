@@ -2,30 +2,23 @@
 #include <SDL_image.h>
 #include <iostream>
 
+Window wind;
+
 Window::Window(const std::string& title, int w, int h) :
 	title(title), w(w), h(h)
 {
-	
-	if (!init())
-	{
-		closed = true;
-	}
+	closed = !init();
 }
 
-/*
-	Decunstructor, destroys the renderers and quits the window
-*/
+//Decunstructor, destroys the renderers and quits the window
 Window::~Window()
 {
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
-	IMG_Quit();
 	SDL_Quit();
 }
 
-/*
-	Controls the window so it can be quited
-*/
+//Controls the window so it can be quited
 void Window::pollEvents(SDL_Event& event)
 {
 	switch (event.type)
@@ -41,14 +34,14 @@ void Window::pollEvents(SDL_Event& event)
 	}
 }
 
-
+//set the background color of the window and clear the renderer
 void Window::showWindow()
 {
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
 }
 
-
+//initilaze and create the window
 bool Window::init()
 {
 
@@ -68,7 +61,7 @@ bool Window::init()
 		return false;
 	}
 
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 	if (renderer == nullptr)
 	{
@@ -78,5 +71,3 @@ bool Window::init()
 
 	return true;
 }
-
-Window wind;
